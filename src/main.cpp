@@ -33,6 +33,129 @@ template <typename T, typename R, typename... Args> auto wrap_member_function(T 
     return std::function<R(Args...)>{[&obj, f](Args &&...args) { return (obj.*f)(std::forward<Args>(args)...); }};
 }
 
+void setVec3(GLint unif_loc, const glm::vec3 &value) { glUniform3fv(unif_loc, 1, &value[0]); }
+void setFloat(GLint unif_loc, float value) { glUniform1f(unif_loc, value); }
+
+void set_shader_light_data(FPSCamera &camera, ShaderCache &shader_cache) {
+
+    /*glm::vec3 pointLightPositions[] = {glm::vec3(0.7f, 0.2f, 2.0f), glm::vec3(2.3f, -3.3f, -4.0f),*/
+    /*                                   glm::vec3(-4.0f, 2.0f, -12.0f), glm::vec3(0.0f, 0.0f, -3.0f)};*/
+
+    glm::vec3 pointLightPositions[] = {glm::vec3(100, 100, 100), glm::vec3(100, 100, 100), glm::vec3(100, 100, 100),
+                                       glm::vec3(100, 100, 100)};
+
+    ShaderProgramInfo shader_info =
+        shader_cache.get_shader_program(ShaderType::TEXTURE_PACKER_CWL_V_TRANSFORMATION_UBOS_1024_MULTIPLE_LIGHTS);
+
+    shader_cache.use_shader_program(ShaderType::TEXTURE_PACKER_CWL_V_TRANSFORMATION_UBOS_1024_MULTIPLE_LIGHTS);
+
+    GLint location = glGetUniformLocation(shader_info.id, "view_pos");
+    if (location == -1) {
+        std::cout << "bad" << std::endl;
+    }
+    setVec3(location, camera.transform.position);
+
+    /*
+       Here we set all the uniforms for the 5/6 types of lights we have. We have to set them manually and index
+       the proper PointLight struct in the array to set each uniform variable. This can be done more code-friendly
+       by defining light types as classes and set their values in there, or by using a more efficient uniform approach
+       by using 'Uniform buffer objects', but that is something we'll discuss in the 'Advanced GLSL' tutorial.
+    */
+    // directional light
+    location = glGetUniformLocation(shader_info.id, "dir_light.direction");
+
+    setVec3(location, {-0.2f, -1.0f, -0.3f});
+    location = glGetUniformLocation(shader_info.id, "dir_light.ambient");
+    setVec3(location, {0.05f, 0.05f, 0.05f});
+    location = glGetUniformLocation(shader_info.id, "dir_light.diffuse");
+    setVec3(location, {0.4f, 0.4f, 0.4f});
+    location = glGetUniformLocation(shader_info.id, "dir_light.specular");
+    setVec3(location, {0.5f, 0.5f, 0.5f});
+    // point light 1
+    location = glGetUniformLocation(shader_info.id, "point_lights[0].position");
+    setVec3(location, pointLightPositions[0]);
+    location = glGetUniformLocation(shader_info.id, "point_lights[0].ambient");
+    setVec3(location, {0.05f, 0.05f, 0.05f});
+    location = glGetUniformLocation(shader_info.id, "point_lights[0].diffuse");
+    setVec3(location, {0.8f, 0.8f, 0.8f});
+    location = glGetUniformLocation(shader_info.id, "point_lights[0].specular");
+    setVec3(location, {1.0f, 1.0f, 1.0f});
+    location = glGetUniformLocation(shader_info.id, "point_lights[0].constant");
+    setFloat(location, 1.0f);
+    location = glGetUniformLocation(shader_info.id, "point_lights[0].linear");
+    setFloat(location, 0.09f);
+    location = glGetUniformLocation(shader_info.id, "point_lights[0].quadratic");
+    setFloat(location, 0.032f);
+    // point light 2
+    location = glGetUniformLocation(shader_info.id, "point_lights[1].position");
+    setVec3(location, pointLightPositions[1]);
+    location = glGetUniformLocation(shader_info.id, "point_lights[1].ambient");
+    setVec3(location, {0.05f, 0.05f, 0.05f});
+    location = glGetUniformLocation(shader_info.id, "point_lights[1].diffuse");
+    setVec3(location, {0.8f, 0.8f, 0.8f});
+    location = glGetUniformLocation(shader_info.id, "point_lights[1].specular");
+    setVec3(location, {1.0f, 1.0f, 1.0f});
+    location = glGetUniformLocation(shader_info.id, "point_lights[1].constant");
+    setFloat(location, 1.0f);
+    location = glGetUniformLocation(shader_info.id, "point_lights[1].linear");
+    setFloat(location, 0.09f);
+    location = glGetUniformLocation(shader_info.id, "point_lights[1].quadratic");
+    setFloat(location, 0.032f);
+    // point light 3
+    location = glGetUniformLocation(shader_info.id, "point_lights[2].position");
+    setVec3(location, pointLightPositions[2]);
+    location = glGetUniformLocation(shader_info.id, "point_lights[2].ambient");
+    setVec3(location, {0.05f, 0.05f, 0.05f});
+    location = glGetUniformLocation(shader_info.id, "point_lights[2].diffuse");
+    setVec3(location, {0.8f, 0.8f, 0.8f});
+    location = glGetUniformLocation(shader_info.id, "point_lights[2].specular");
+    setVec3(location, {1.0f, 1.0f, 1.0f});
+    location = glGetUniformLocation(shader_info.id, "point_lights[2].constant");
+    setFloat(location, 1.0f);
+    location = glGetUniformLocation(shader_info.id, "point_lights[2].linear");
+    setFloat(location, 0.09f);
+    location = glGetUniformLocation(shader_info.id, "point_lights[2].quadratic");
+    setFloat(location, 0.032f);
+    // point light 4
+    location = glGetUniformLocation(shader_info.id, "point_lights[3].position");
+    setVec3(location, pointLightPositions[3]);
+    location = glGetUniformLocation(shader_info.id, "point_lights[3].ambient");
+    setVec3(location, {0.05f, 0.05f, 0.05f});
+    location = glGetUniformLocation(shader_info.id, "point_lights[3].diffuse");
+    setVec3(location, {0.8f, 0.8f, 0.8f});
+    location = glGetUniformLocation(shader_info.id, "point_lights[3].specular");
+    setVec3(location, {1.0f, 1.0f, 1.0f});
+    location = glGetUniformLocation(shader_info.id, "point_lights[3].constant");
+    setFloat(location, 1.0f);
+    location = glGetUniformLocation(shader_info.id, "point_lights[3].linear");
+    setFloat(location, 0.09f);
+    location = glGetUniformLocation(shader_info.id, "point_lights[3].quadratic");
+    setFloat(location, 0.032f);
+    // spotLight
+    location = glGetUniformLocation(shader_info.id, "spot_light.position");
+    setVec3(location, camera.transform.position);
+    location = glGetUniformLocation(shader_info.id, "spot_light.direction");
+    setVec3(location, camera.transform.compute_forward_vector());
+    location = glGetUniformLocation(shader_info.id, "spot_light.ambient");
+    setVec3(location, {0.0f, 0.0f, 0.0f});
+    location = glGetUniformLocation(shader_info.id, "spot_light.diffuse");
+    setVec3(location, {1.0f, 1.0f, 1.0f});
+    location = glGetUniformLocation(shader_info.id, "spot_light.specular");
+    setVec3(location, {1.0f, 1.0f, 1.0f});
+    location = glGetUniformLocation(shader_info.id, "spot_light.constant");
+    setFloat(location, 1.0f);
+    location = glGetUniformLocation(shader_info.id, "spot_light.linear");
+    setFloat(location, 0.09f);
+    location = glGetUniformLocation(shader_info.id, "spot_light.quadratic");
+    setFloat(location, 0.032f);
+    location = glGetUniformLocation(shader_info.id, "spot_light.cut_off");
+    setFloat(location, glm::cos(glm::radians(12.5f)));
+    /*setFloat(location, glm::cos(glm::radians(1.5f)));*/
+    location = glGetUniformLocation(shader_info.id, "spot_light.outer_cut_off");
+    setFloat(location, glm::cos(glm::radians(15.0f)));
+    /*setFloat(location, glm::cos(glm::radians(2.0f)));*/
+}
+
 int main() {
     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     console_sink->set_level(spdlog::level::debug);
@@ -46,7 +169,7 @@ int main() {
         initialize_glfw_glad_and_return_window(SCREEN_WIDTH, SCREEN_HEIGHT, "glfw window", false, true, false);
 
     std::vector<ShaderType> requested_shaders = {
-        ShaderType::TEXTURE_PACKER_CWL_V_TRANSFORMATION_UBOS_1024_AMBIENT_AND_DIFFUSE_LIGHTING};
+        ShaderType::TEXTURE_PACKER_CWL_V_TRANSFORMATION_UBOS_1024_MULTIPLE_LIGHTS};
     ShaderCache shader_cache(requested_shaders, sinks);
     Batcher batcher(shader_cache);
 
@@ -68,6 +191,9 @@ int main() {
     std::vector<IVPNTexturePacked> packed_lightbulb = convert_ivpnt_to_ivpntp(lightbulb, texture_packer);
 
     int width, height;
+
+    glm::vec3 pointLightPositions[] = {glm::vec3(0.7f, 0.2f, 2.0f), glm::vec3(2.3f, -3.3f, -4.0f),
+                                       glm::vec3(-4.0f, 2.0f, -12.0f), glm::vec3(0.0f, 0.0f, -3.0f)};
 
     glm::vec4 color = glm::vec4(.5, .5, .5, 1);
 
@@ -103,9 +229,9 @@ int main() {
         glm::mat4 projection = camera.get_projection_matrix();
         glm::mat4 view = camera.get_view_matrix();
 
-        shader_cache.set_uniform(ShaderType::TEXTURE_PACKER_CWL_V_TRANSFORMATION_UBOS_1024_AMBIENT_AND_DIFFUSE_LIGHTING,
+        shader_cache.set_uniform(ShaderType::TEXTURE_PACKER_CWL_V_TRANSFORMATION_UBOS_1024_MULTIPLE_LIGHTS,
                                  ShaderUniformVariable::CAMERA_TO_CLIP, projection);
-        shader_cache.set_uniform(ShaderType::TEXTURE_PACKER_CWL_V_TRANSFORMATION_UBOS_1024_AMBIENT_AND_DIFFUSE_LIGHTING,
+        shader_cache.set_uniform(ShaderType::TEXTURE_PACKER_CWL_V_TRANSFORMATION_UBOS_1024_MULTIPLE_LIGHTS,
                                  ShaderUniformVariable::WORLD_TO_CAMERA, view);
         /*shader_cache.set_uniform(ShaderType::TEXTURE_PACKER_CWL_V_TRANSFORMATION_UBOS_1024,*/
         /*                         ShaderUniformVariable::LOCAL_TO_WORLD, glm::mat4(1.0));*/
@@ -137,34 +263,35 @@ int main() {
 
         glm::vec3 diffuse_light_position(lightPosX, lightPosY, lightPosZ);
 
-        shader_cache.set_uniform(ShaderType::TEXTURE_PACKER_CWL_V_TRANSFORMATION_UBOS_1024_AMBIENT_AND_DIFFUSE_LIGHTING,
-                                 ShaderUniformVariable::AMBIENT_LIGHT_STRENGTH, ambient_light_strength);
-        shader_cache.set_uniform(ShaderType::TEXTURE_PACKER_CWL_V_TRANSFORMATION_UBOS_1024_AMBIENT_AND_DIFFUSE_LIGHTING,
-                                 ShaderUniformVariable::AMBIENT_LIGHT_COLOR, ambient_light_color);
-        shader_cache.set_uniform(ShaderType::TEXTURE_PACKER_CWL_V_TRANSFORMATION_UBOS_1024_AMBIENT_AND_DIFFUSE_LIGHTING,
-                                 ShaderUniformVariable::DIFFUSE_LIGHT_POSITION, diffuse_light_position);
+        /*shader_cache.set_uniform(ShaderType::TEXTURE_PACKER_CWL_V_TRANSFORMATION_UBOS_1024_MULTIPLE_LIGHTS,*/
+        /*                         ShaderUniformVariable::AMBIENT_LIGHT_STRENGTH, ambient_light_strength);*/
+        /*shader_cache.set_uniform(ShaderType::TEXTURE_PACKER_CWL_V_TRANSFORMATION_UBOS_1024_MULTIPLE_LIGHTS,*/
+        /*                         ShaderUniformVariable::AMBIENT_LIGHT_COLOR, ambient_light_color);*/
+        /*shader_cache.set_uniform(ShaderType::TEXTURE_PACKER_CWL_V_TRANSFORMATION_UBOS_1024_MULTIPLE_LIGHTS,*/
+        /*                         ShaderUniformVariable::DIFFUSE_LIGHT_POSITION, diffuse_light_position);*/
+
+        set_shader_light_data(camera, shader_cache);
 
         unsigned int count = 0;
         for (auto &ivptp : packed_backpack) {
             std::vector<unsigned int> ltw_indices(ivptp.xyz_positions.size(), 0);
             std::vector<int> ptis(ivptp.xyz_positions.size(), ivptp.packed_texture_index);
-            batcher.texture_packer_cwl_v_transformation_ubos_1024_ambient_and_diffuse_lighting_shader_batcher
-                .queue_draw(count, ivptp.indices, ivptp.xyz_positions, ltw_indices, ptis,
-                            ivptp.packed_texture_coordinates, ivptp.normals);
+            batcher.texture_packer_cwl_v_transformation_ubos_1024_multiple_lights_shader_batcher.queue_draw(
+                count, ivptp.indices, ivptp.xyz_positions, ltw_indices, ptis, ivptp.packed_texture_coordinates,
+                ivptp.normals);
             count++;
         }
 
         for (auto &ivptp : packed_lightbulb) {
             std::vector<unsigned int> ltw_indices(ivptp.xyz_positions.size(), 0);
             std::vector<int> ptis(ivptp.xyz_positions.size(), ivptp.packed_texture_index);
-            batcher.texture_packer_cwl_v_transformation_ubos_1024_ambient_and_diffuse_lighting_shader_batcher
-                .queue_draw(count, ivptp.indices, ivptp.xyz_positions, ltw_indices, ptis,
-                            ivptp.packed_texture_coordinates, ivptp.normals);
+            batcher.texture_packer_cwl_v_transformation_ubos_1024_multiple_lights_shader_batcher.queue_draw(
+                count, ivptp.indices, ivptp.xyz_positions, ltw_indices, ptis, ivptp.packed_texture_coordinates,
+                ivptp.normals);
             count++;
         }
 
-        batcher.texture_packer_cwl_v_transformation_ubos_1024_ambient_and_diffuse_lighting_shader_batcher
-            .draw_everything();
+        batcher.texture_packer_cwl_v_transformation_ubos_1024_multiple_lights_shader_batcher.draw_everything();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
